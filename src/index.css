@@ -1,0 +1,20 @@
+:root {
+  --accent-green: #22c55e;
+  --accent-red:   #ef4444;
+  --accent-orange:#f97316;
+  --accent-blue:  #3b82f6;
+  --bg-dark:      #0f172a;
+  --card-bg:      #1e293b;
+  --text-main:    #f8fafc;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+}
+
+.text-green-500 { color: var(--accent-green); }
+.text-red-500   { color: var(--accent-red); }
+.text-slate-400 { color: #94a3b8; }
