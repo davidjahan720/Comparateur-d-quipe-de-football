@@ -10,12 +10,16 @@ interface WatchlistStore {
 }
 
 const initialTeams: WatchlistTeam[] = [
-  { id: 85, name: "PSG", nameOfficial: "Paris Saint-Germain", logo: "...", country: "France", league: "Ligue 1" },
-  { id: 541, name: "Real Madrid", nameOfficial: "Real Madrid", logo: "...", country: "Spain", league: "La Liga" },
-  { id: 50, name: "Man City", nameOfficial: "Manchester City", logo: "...", country: "England", league: "Premier League" },
-  { id: 157, name: "Bayern", nameOfficial: "Bayern Munich", logo: "...", country: "Germany", league: "Bundesliga" },
-  { id: 0, name: "Local", nameOfficial: "Équipe locale", logo: "...", country: "France", league: "Local", needsIdResolution: true },
-]
+  { id: 0, name: "QPR", nameOfficial: "Queens Park Rangers FC", logo: "", country: "Angleterre", league: "EFL Championship" },
+  { id: 0, name: "Brighton", nameOfficial: "Brighton & Hove Albion FC", logo: "", country: "Angleterre", league: "Premier League" },
+  { id: 0, name: "Aston Villa", nameOfficial: "Aston Villa FC", logo: "", country: "Angleterre", league: "Premier League" },
+  { id: 0, name: "Eibar", nameOfficial: "SD Eibar", logo: "", country: "Espagne", league: "La Liga 2" },
+  { id: 0, name: "Malaga", nameOfficial: "Málaga CF", logo: "", country: "Espagne", league: "La Liga Hypermotion" },
+  { id: 0, name: "Coventry", nameOfficial: "Coventry City FC", logo: "", country: "Angleterre", league: "EFL Championship" },
+  { id: 0, name: "Lorient", nameOfficial: "FC Lorient", logo: "", country: "France", league: "Ligue 2" },
+  { id: 0, name: "Brentford", nameOfficial: "Brentford FC", logo: "", country: "Angleterre", league: "Premier League" },
+  { id: 0, name: "Villarreal", nameOfficial: "Villarreal CF", logo: "", country: "Espagne", league: "La Liga" },
+].map(t => ({ ...t, needsIdResolution: true }))
 
 export const useWatchlistStore = create<WatchlistStore>()(
   persist(
