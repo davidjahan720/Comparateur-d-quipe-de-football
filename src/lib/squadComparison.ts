@@ -1,4 +1,4 @@
-import type { SquadSeason, SquadComparison, Position, Player, PositionStat } from "../types/squad"
+import type { SquadSeason, SquadComparison, Position, PositionStat } from "../types/squad"
 
 export const computeComparison = (
   prev: SquadSeason,

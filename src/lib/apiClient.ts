@@ -1,5 +1,4 @@
 // Client HTTP pour API-Football (RapidAPI)
-const BASE_URL = "https://api-football-v3.p.rapidapi.com/v3"
 
 export const apiFetch = async (endpoint: string, params: Record<string, string>) => {
   const url = new URL("/api/football", window.location.origin)

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { ComparisonDetailPanel } from "../components/ComparisonDetailPanel"
 
 // Simulation de données pour le prototype (à remplacer par des appels réels via React Query)
@@ -10,6 +10,7 @@ export const SquadDetailPage = () => {
 
   return (
     <div className="p-4">
+      <Link to="/" className="text-blue-500 mb-2 block">← Retour</Link>
       <h1 className="text-2xl font-bold mb-6">Équipe {teamId}</h1>
       
       <div className="grid gap-4">
