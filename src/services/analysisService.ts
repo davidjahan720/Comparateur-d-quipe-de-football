@@ -38,6 +38,9 @@ export const analyzeSquadStrength = async (
   
   const data = await response.json()
   const raw = data.choices[0].message.content
-  const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+  const cleaned = raw
+    .replace(/```json\n?/g, '').replace(/```\n?/g, '')
+    .replace(/[\x00-\x1F\x7F]/g, ' ')
+    .trim()
   return JSON.parse(cleaned)
 }

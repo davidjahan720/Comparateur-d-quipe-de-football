@@ -24,23 +24,55 @@ export const searchTeams = async (query: string): Promise<WatchlistTeam[]> => {
 }
 
 export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel: string): Promise<SquadSeason> => {
-  const data = await apiFetch("/players/squads", { team: teamId.toString() })
-  const players = data.response[0]?.players.map((p: any) => ({
-    id: p.id,
-    name: p.name,
-    position: mapPosition(p.position),
-    age: p.age,
-    nationality: p.nationality,
-    jerseyNumber: p.number,
-    photo: p.photo,
-  })) || []
+  console.log("fetchSquad appelé", teamId, seasonYear);
+  const isCurrent = seasonYear === 2025; // Saison actuelle 2025/26
+  
+  const endpoint = isCurrent ? "/players/squads" : "/players";
+  const params = isCurrent 
+    ? { team: teamId.toString() } 
+    : { team: teamId.toString(), season: seasonYear.toString(), page: "1" };
+
+  console.log("URL/Params:", endpoint, params);
+  console.log("KEY:", import.meta.env.VITE_API_FOOTBALL_KEY ? "présente" : "ABSENTE");
+
+  const data = await apiFetch(endpoint, params);
+  
+  console.log(`API Response for ${seasonLabel} (endpoint: ${endpoint}):`, data);
+  console.log("response JSON:", JSON.stringify(data).slice(0, 500));
+
+  let players: Player[] = [];
+  let teamName = "";
+
+  if (isCurrent) {
+    teamName = data.response[0]?.team.name || "";
+    players = data.response[0]?.players.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      position: mapPosition(p.pos), // Attention: API utilise 'pos'
+      age: p.age,
+      nationality: "Unknown", // Non fourni par /players/squads
+      jerseyNumber: p.number,
+      photo: p.photo,
+    })) || [];
+  } else {
+    teamName = data.response[0]?.statistics[0]?.team.name || "";
+    players = data.response.map((item: any) => ({
+      id: item.player.id,
+      name: item.player.name,
+      position: mapPosition(item.statistics[0].games.position),
+      age: item.player.age,
+      nationality: item.player.nationality,
+      jerseyNumber: item.statistics[0].games.number,
+      photo: item.player.photo,
+    })) || [];
+  }
 
   const totalAge = players.reduce((sum: number, p: Player) => sum + p.age, 0)
   
   return {
     teamId,
-    teamName: data.response[0]?.team.name || "",
-    slot: "N", // À déduire selon le contexte d'utilisation
+    teamName,
+    slot: "N",
     seasonYear,
     seasonLabel,
     players,
