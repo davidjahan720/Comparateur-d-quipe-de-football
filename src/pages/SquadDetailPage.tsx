@@ -53,9 +53,9 @@ export const SquadDetailPage = () => {
       </div>
 
       <div className="bg-slate-800 p-4 rounded">
-        {activeTab === 0 && <SquadTable players={squad0?.players || []} isLoading={load0} />}
-        {activeTab === 1 && <SquadTable players={squad1?.players || []} prevPlayers={squad0?.players} isLoading={load1} />}
-        {activeTab === 2 && <SquadTable players={squad2?.players || []} prevPlayers={squad1?.players} isLoading={load2} />}
+        {activeTab === 0 && <SquadTable players={squad0?.players || []} isLoading={load0} isHistorical={true} />}
+        {activeTab === 1 && <SquadTable players={squad1?.players || []} prevPlayers={squad0?.players} isLoading={load1} isHistorical={true} />}
+        {activeTab === 2 && <SquadTable players={squad2?.players || []} prevPlayers={squad1?.players} isLoading={load2} isHistorical={false} />}
         {activeTab === 3 && comparison && (
             <ComparisonDetailPanel prevSquad={comparison.previousSeason} currSquad={comparison.currentSeason} arrivals={comparison.arrivals} />
         )}

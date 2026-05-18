@@ -5,9 +5,10 @@ interface Props {
   players: Player[];
   prevPlayers?: Player[];
   isLoading?: boolean;
+  isHistorical?: boolean;
 }
 
-export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
+export const SquadTable = ({ players, prevPlayers = [], isLoading, isHistorical }: Props) => {
   const [filter, setFilter] = useState<Position | "ALL">("ALL");
   const [sortKey, setSortKey] = useState<"name" | "age" | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
@@ -69,6 +70,13 @@ export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
           <button key={pos} onClick={() => setFilter(pos)} className={`px-3 py-1 rounded ${filter === pos ? "bg-blue-600" : "bg-slate-700"}`}>{pos}</button>
         ))}
       </div>
+
+      {isHistorical && (
+        <p className="text-xs text-slate-400 italic mb-2">
+          * Uniquement les joueurs ayant participé à au moins 1 match cette saison
+        </p>
+      )}
+
       <table className="w-full text-sm text-left">
         <thead className="text-slate-400 border-b border-slate-700">
           <tr>
