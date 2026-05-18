@@ -52,7 +52,7 @@ export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel
     // Format /players
     teamName = data.response[0]?.statistics[0]?.team.name || "";
     players = data.response
-      .filter((item: any) => (item.statistics[0]?.games?.appearences || 0) >= 5)
+      .filter((item: any) => (item.statistics[0]?.games?.appearences || 0) >= 2)
       .map((item: any) => ({
         id: item.player.id,
         name: item.player.name,
