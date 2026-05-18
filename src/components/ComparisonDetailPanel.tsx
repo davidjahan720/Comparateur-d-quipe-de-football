@@ -17,7 +17,7 @@ export const ComparisonDetailPanel = ({ prevSquad, currSquad, arrivals }: Props)
       .catch(console.error)
   }, [prevSquad, currSquad, arrivals])
 
-  const renderSimpleList = (players: Player[]) => {
+  const renderSimpleList = (players: Player[], otherSquad: SquadSeason, isPrev: boolean) => {
     const positionOrder: Record<Position, number> = { GK: 1, DEF: 2, MID: 3, FWD: 4 };
     const sorted = [...players].sort((a, b) => {
         const posDiff = positionOrder[a.position] - positionOrder[b.position];
@@ -30,14 +30,23 @@ export const ComparisonDetailPanel = ({ prevSquad, currSquad, arrivals }: Props)
         return lastNameA.localeCompare(lastNameB);
     });
 
+    const otherIds = new Set(otherSquad.players.map(p => p.id));
+
     return (
       <ul className="text-xs space-y-1">
-        {sorted.map(p => (
-          <li key={p.id} className="flex justify-between border-b border-slate-800 pb-1">
-            <span className="text-slate-300">{p.name}</span>
-            <span className="text-slate-500 font-mono w-8 text-right">{p.position}</span>
-          </li>
-        ))}
+        {sorted.map(p => {
+          const isSpecial = !otherIds.has(p.id);
+          return (
+            <li key={p.id} className={`flex justify-between items-center border-b border-slate-800 pb-1 ${isSpecial && isPrev ? 'opacity-50' : ''}`}>
+              <div className="flex items-center gap-2 overflow-hidden">
+                <span className="text-slate-300 truncate">{p.name}</span>
+                {isSpecial && !isPrev && <span className="text-[8px] bg-green-900 text-green-300 px-1 rounded flex-shrink-0">ARRIVÉE</span>}
+                {isSpecial && isPrev && <span className="text-[8px] bg-red-900 text-red-300 px-1 rounded flex-shrink-0">DÉPART</span>}
+              </div>
+              <span className="text-slate-500 font-mono w-8 text-right flex-shrink-0">{p.position}</span>
+            </li>
+          );
+        })}
       </ul>
     );
   };
@@ -50,13 +59,13 @@ export const ComparisonDetailPanel = ({ prevSquad, currSquad, arrivals }: Props)
           <h4 className="text-sm font-bold text-slate-400 mb-3 border-b border-slate-700 pb-2 uppercase">
             Effectif {prevSquad.seasonLabel} (N-1)
           </h4>
-          {renderSimpleList(prevSquad.players)}
+          {renderSimpleList(prevSquad.players, currSquad, true)}
         </div>
         <div className="bg-slate-900 p-3 rounded">
           <h4 className="text-sm font-bold text-slate-400 mb-3 border-b border-slate-700 pb-2 uppercase">
             Effectif {currSquad.seasonLabel} (N)
           </h4>
-          {renderSimpleList(currSquad.players)}
+          {renderSimpleList(currSquad.players, prevSquad, false)}
         </div>
       </div>
 

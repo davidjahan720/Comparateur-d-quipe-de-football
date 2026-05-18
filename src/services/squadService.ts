@@ -23,21 +23,14 @@ export const searchTeams = async (query: string): Promise<WatchlistTeam[]> => {
 }
 
 export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel: string): Promise<SquadSeason> => {
-  console.log("fetchSquad appelé", teamId, seasonYear);
   const isCurrent = seasonYear === 2025; // Saison actuelle 2025/26
   
   const endpoint = isCurrent ? "/players/squads" : "/players";
-  const params = isCurrent 
-    ? { team: teamId.toString() } 
-    : { team: teamId.toString(), season: seasonYear.toString(), page: "1" };
-
-  const data = await apiFetch(endpoint, params);
-  
   let players: Player[] = [];
   let teamName = "";
 
   if (isCurrent) {
-    // Format /players/squads
+    const data = await apiFetch(endpoint, { team: teamId.toString() });
     teamName = data.response[0]?.team.name || "";
     players = data.response[0]?.players.map((p: any) => ({
       id: p.id,
@@ -49,19 +42,37 @@ export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel
       photo: p.photo,
     })) || [];
   } else {
-    // Format /players
-    teamName = data.response[0]?.statistics[0]?.team.name || "";
-    players = data.response
-      .filter((item: any) => (item.statistics[0]?.games?.appearences || 0) >= 1)
-      .map((item: any) => ({
-        id: item.player.id,
-        name: item.player.name,
-        position: normalizePosition(item.statistics[0].games.position),
-        age: item.player.age,
-        nationality: item.player.nationality,
-        jerseyNumber: item.statistics[0].games.number,
-        photo: item.player.photo,
-      })) || [];
+    // Boucle pour récupérer toutes les pages de joueurs (historique)
+    let page = 1;
+    let totalPages = 1;
+
+    do {
+      const data = await apiFetch(endpoint, { 
+        team: teamId.toString(), 
+        season: seasonYear.toString(), 
+        page: page.toString() 
+      });
+
+      if (page === 1) {
+        teamName = data.response[0]?.statistics[0]?.team.name || "";
+        totalPages = data.paging.total;
+      }
+
+      const pagePlayers = data.response
+        .filter((item: any) => (item.statistics[0]?.games?.appearences || 0) >= 1)
+        .map((item: any) => ({
+          id: item.player.id,
+          name: item.player.name,
+          position: normalizePosition(item.statistics[0].games.position),
+          age: item.player.age,
+          nationality: item.player.nationality,
+          jerseyNumber: item.statistics[0].games.number,
+          photo: item.player.photo,
+        }));
+
+      players = [...players, ...pagePlayers];
+      page++;
+    } while (page <= totalPages);
   }
 
   const totalAge = players.reduce((sum: number, p: Player) => sum + p.age, 0)
