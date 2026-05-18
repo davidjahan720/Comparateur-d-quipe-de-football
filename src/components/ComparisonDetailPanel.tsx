@@ -21,7 +21,13 @@ export const ComparisonDetailPanel = ({ prevSquad, currSquad, arrivals }: Props)
     const positionOrder: Record<Position, number> = { GK: 1, DEF: 2, MID: 3, FWD: 4 };
     const sorted = [...players].sort((a, b) => {
         const posDiff = positionOrder[a.position] - positionOrder[b.position];
-        return posDiff !== 0 ? posDiff : a.name.localeCompare(b.name);
+        if (posDiff !== 0) return posDiff;
+
+        const partsA = a.name.split(" ");
+        const partsB = b.name.split(" ");
+        const lastNameA = partsA[partsA.length - 1];
+        const lastNameB = partsB[partsB.length - 1];
+        return lastNameA.localeCompare(lastNameB);
     });
 
     return (

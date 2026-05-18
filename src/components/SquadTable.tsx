@@ -18,17 +18,24 @@ export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
     // Ordre des postes pour le tri
     const positionOrder: Record<Position, number> = { GK: 1, DEF: 2, MID: 3, FWD: 4 };
 
-    // Trier par poste par défaut, puis par nom (A-Z)
+    // Trier par poste par défaut, puis par nom de famille (A-Z)
     list = [...list].sort((a, b) => {
         const posDiff = positionOrder[a.position] - positionOrder[b.position];
         if (posDiff !== 0) return posDiff;
 
-        // Si même poste ou filtre spécifique, trier par le critère choisi ou par nom par défaut
         const key = sortKey || "name";
         const valA = a[key];
         const valB = b[key];
         
         if (typeof valA === "string" && typeof valB === "string") {
+            // Pour le nom, on essaie de trier par le dernier mot (nom de famille)
+            if (key === "name") {
+                const partsA = valA.split(" ");
+                const partsB = valB.split(" ");
+                const lastNameA = partsA[partsA.length - 1];
+                const lastNameB = partsB[partsB.length - 1];
+                return sortDir === "asc" ? lastNameA.localeCompare(lastNameB) : lastNameB.localeCompare(lastNameA);
+            }
             return sortDir === "asc" ? valA.localeCompare(valB) : valB.localeCompare(valA);
         }
         if (typeof valA === "number" && typeof valB === "number") {

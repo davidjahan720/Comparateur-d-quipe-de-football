@@ -2,13 +2,12 @@ import { apiFetch } from "../lib/apiClient"
 import type { WatchlistTeam, SquadSeason, Position, Player } from "../types/squad"
 
 const mapPosition = (pos: string): Position => {
-  switch (pos) {
-    case "Goalkeeper": return "GK"
-    case "Defender": return "DEF"
-    case "Midfielder": return "MID"
-    case "Attacker": return "FWD"
-    default: return "DEF"
-  }
+  const p = pos?.toLowerCase() || "";
+  if (p.includes("goalkeeper") || p === "g") return "GK";
+  if (p.includes("defender") || p === "d") return "DEF";
+  if (p.includes("midfielder") || p === "m") return "MID";
+  if (p.includes("attacker") || p === "a") return "FWD";
+  return "DEF";
 }
 
 export const searchTeams = async (query: string): Promise<WatchlistTeam[]> => {
