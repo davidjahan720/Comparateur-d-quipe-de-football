@@ -1,13 +1,13 @@
 import { apiFetch } from "../lib/apiClient"
 import type { WatchlistTeam, SquadSeason, Position, Player } from "../types/squad"
 
-const mapPosition = (pos: string): Position => {
-  const p = pos?.toLowerCase() || "";
-  if (p.includes("goalkeeper") || p === "g") return "GK";
-  if (p.includes("defender") || p === "d") return "DEF";
-  if (p.includes("midfielder") || p === "m") return "MID";
-  if (p.includes("attacker") || p === "a") return "FWD";
-  return "DEF";
+const normalizePosition = (pos: string): Position => {
+  const p = pos?.toUpperCase()
+  if (p === "G" || p === "GK" || p === "GOALKEEPER") return "GK"
+  if (p === "D" || p === "DEF" || p === "DEFENDER") return "DEF"
+  if (p === "M" || p === "MID" || p === "MIDFIELDER") return "MID"
+  if (p === "F" || p === "FWD" || p === "ATTACKER" || p === "FORWARD") return "FWD"
+  return "DEF" // fallback
 }
 
 export const searchTeams = async (query: string): Promise<WatchlistTeam[]> => {
@@ -31,34 +31,30 @@ export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel
     ? { team: teamId.toString() } 
     : { team: teamId.toString(), season: seasonYear.toString(), page: "1" };
 
-  console.log("URL/Params:", endpoint, params);
-  console.log("KEY:", import.meta.env.VITE_API_FOOTBALL_KEY ? "présente" : "ABSENTE");
-
   const data = await apiFetch(endpoint, params);
   
-  console.log(`API Response for ${seasonLabel} (endpoint: ${endpoint}):`, data);
-  console.log("response JSON:", JSON.stringify(data).slice(0, 500));
-
   let players: Player[] = [];
   let teamName = "";
 
   if (isCurrent) {
+    // Format /players/squads
     teamName = data.response[0]?.team.name || "";
     players = data.response[0]?.players.map((p: any) => ({
       id: p.id,
       name: p.name,
-      position: mapPosition(p.pos), // Attention: API utilise 'pos'
+      position: normalizePosition(p.pos),
       age: p.age,
-      nationality: "Unknown", // Non fourni par /players/squads
+      nationality: "Unknown",
       jerseyNumber: p.number,
       photo: p.photo,
     })) || [];
   } else {
+    // Format /players
     teamName = data.response[0]?.statistics[0]?.team.name || "";
     players = data.response.map((item: any) => ({
       id: item.player.id,
       name: item.player.name,
-      position: mapPosition(item.statistics[0].games.position),
+      position: normalizePosition(item.statistics[0].games.position),
       age: item.player.age,
       nationality: item.player.nationality,
       jerseyNumber: item.statistics[0].games.number,
