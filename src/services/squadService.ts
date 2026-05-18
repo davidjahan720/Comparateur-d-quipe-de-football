@@ -51,15 +51,17 @@ export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel
   } else {
     // Format /players
     teamName = data.response[0]?.statistics[0]?.team.name || "";
-    players = data.response.map((item: any) => ({
-      id: item.player.id,
-      name: item.player.name,
-      position: normalizePosition(item.statistics[0].games.position),
-      age: item.player.age,
-      nationality: item.player.nationality,
-      jerseyNumber: item.statistics[0].games.number,
-      photo: item.player.photo,
-    })) || [];
+    players = data.response
+      .filter((item: any) => (item.statistics[0]?.games?.appearences || 0) >= 5)
+      .map((item: any) => ({
+        id: item.player.id,
+        name: item.player.name,
+        position: normalizePosition(item.statistics[0].games.position),
+        age: item.player.age,
+        nationality: item.player.nationality,
+        jerseyNumber: item.statistics[0].games.number,
+        photo: item.player.photo,
+      })) || [];
   }
 
   const totalAge = players.reduce((sum: number, p: Player) => sum + p.age, 0)
