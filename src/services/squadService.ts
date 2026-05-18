@@ -38,16 +38,21 @@ export const fetchSquad = async (teamId: number, seasonYear: number, seasonLabel
 
   if (isCurrent) {
     // Format /players/squads
+    console.log("RAW RESPONSE 2025:", JSON.stringify(data.response[0]?.players?.[0]));
     teamName = data.response[0]?.team.name || "";
-    players = data.response[0]?.players.map((p: any) => ({
-      id: p.id,
-      name: p.name,
-      position: normalizePosition(p.pos),
-      age: p.age,
-      nationality: "Unknown",
-      jerseyNumber: p.number,
-      photo: p.photo,
-    })) || [];
+    players = data.response[0]?.players.map((p: any) => {
+      const pos = normalizePosition(p.pos);
+      console.log(`Player: ${p.name}, Raw Pos: ${p.pos}, Normalized: ${pos}`);
+      return {
+        id: p.id,
+        name: p.name,
+        position: pos,
+        age: p.age,
+        nationality: "Unknown",
+        jerseyNumber: p.number,
+        photo: p.photo,
+      };
+    }) || [];
   } else {
     // Format /players
     teamName = data.response[0]?.statistics[0]?.team.name || "";
