@@ -12,8 +12,15 @@ export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
   const [sortKey, setSortKey] = useState<"name" | "age" | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
+  const isArrival = (p: Player) => !prevPlayers.some((prev) => prev.id === p.id);
+  const isDeparture = (p: Player) => !players.some((curr) => curr.id === p.id);
+
   const filteredPlayers = useMemo(() => {
-    let list = filter === "ALL" ? players : players.filter((p) => p.position === filter);
+    // On combine les joueurs actuels et les départs pour le filtrage
+    const departures = prevPlayers.filter(isDeparture);
+    const allPlayersToShow = [...players, ...departures];
+
+    let list = filter === "ALL" ? allPlayersToShow : allPlayersToShow.filter((p) => p.position === filter);
     
     // Ordre des postes pour le tri
     const positionOrder: Record<Position, number> = { GK: 1, DEF: 2, MID: 3, FWD: 4 };
@@ -44,7 +51,7 @@ export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
         return 0;
     });
     return list;
-  }, [players, filter, sortKey, sortDir]);
+  }, [players, prevPlayers, filter, sortKey, sortDir]);
 
   const toggleSort = (key: "name" | "age") => {
     if (sortKey === key) {
@@ -54,9 +61,6 @@ export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
       setSortDir("asc");
     }
   };
-
-  const isArrival = (p: Player) => !prevPlayers.some((prev) => prev.id === p.id);
-  const isDeparture = (p: Player) => !players.some((curr) => curr.id === p.id);
 
   if (isLoading) {
     return <div className="animate-pulse space-y-2"><div className="h-10 bg-slate-700 rounded" />{[...Array(5)].map((_, i) => <div key={i} className="h-8 bg-slate-800 rounded" />)}</div>;
@@ -80,28 +84,21 @@ export const SquadTable = ({ players, prevPlayers = [], isLoading }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {filteredPlayers.map((player) => (
-            <tr key={player.id} className="border-b border-slate-800 hover:bg-slate-800">
-              <td className="p-2">{player.jerseyNumber || "-"}</td>
-              <td className="p-2 font-medium flex items-center gap-2">
-                {player.name}
-                {isArrival(player) && <span className="text-[10px] bg-green-900 text-green-300 px-1 rounded">ARRIVÉE</span>}
-              </td>
-              <td className="p-2">{player.position}</td>
-              <td className="p-2">{player.age}</td>
-            </tr>
-          ))}
-          {prevPlayers.filter(isDeparture).map((player) => (
-             <tr key={player.id} className="border-b border-slate-800 opacity-50">
-               <td className="p-2">{player.jerseyNumber || "-"}</td>
-               <td className="p-2 font-medium flex items-center gap-2">
-                 {player.name}
-                 <span className="text-[10px] bg-red-900 text-red-300 px-1 rounded">DÉPART</span>
-               </td>
-               <td className="p-2">{player.position}</td>
-               <td className="p-2">{player.age}</td>
-             </tr>
-          ))}
+          {filteredPlayers.map((player) => {
+            const departed = isDeparture(player);
+            return (
+              <tr key={player.id} className={`border-b border-slate-800 ${departed ? 'opacity-50' : 'hover:bg-slate-800'}`}>
+                <td className="p-2">{player.jerseyNumber || "-"}</td>
+                <td className="p-2 font-medium flex items-center gap-2">
+                  {player.name}
+                  {isArrival(player) && <span className="text-[10px] bg-green-900 text-green-300 px-1 rounded">ARRIVÉE</span>}
+                  {departed && <span className="text-[10px] bg-red-900 text-red-300 px-1 rounded">DÉPART</span>}
+                </td>
+                <td className="p-2">{player.position}</td>
+                <td className="p-2">{player.age}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
