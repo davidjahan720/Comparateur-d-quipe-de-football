@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { searchTeams } from "../services/squadService"
 import { useWatchlistStore } from "../store/watchlistStore"
 
@@ -7,6 +7,7 @@ export const SearchPage = () => {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<any[]>([])
   const { addTeam, hasTeam } = useWatchlistStore()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handler = setTimeout(async () => {
@@ -38,16 +39,22 @@ export const SearchPage = () => {
               <div className="font-bold">{team.name}</div>
               <div className="text-xs text-slate-400">{team.country} - {team.league}</div>
             </div>
-            {hasTeam(team.id) ? (
-              <span className="text-sm text-slate-500">Déjà suivi</span>
-            ) : (
-              <button 
-                onClick={() => addTeam(team)} 
+            <div className="flex gap-2 items-center">
+              {!hasTeam(team.id) && (
+                <button
+                  onClick={() => addTeam(team)}
+                  className="bg-slate-700 px-3 py-1 rounded text-sm hover:bg-slate-600 transition-colors"
+                >
+                  + Watchlist
+                </button>
+              )}
+              <button
+                onClick={() => { if (!hasTeam(team.id)) addTeam(team); navigate(`/squad/${team.id}`); }}
                 className="bg-blue-600 px-3 py-1 rounded text-sm hover:bg-blue-500 transition-colors"
               >
-                Ajouter
+                Analyser
               </button>
-            )}
+            </div>
           </div>
         ))}
       </div>

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import { useWatchlistStore } from "../store/watchlistStore"
 
 export const WatchlistPage = () => {
-  const { teams } = useWatchlistStore()
+  const { teams, removeTeam } = useWatchlistStore()
 
   return (
     <div className="p-4">
@@ -16,10 +16,19 @@ export const WatchlistPage = () => {
       ) : (
         <div className="grid gap-4">
           {teams.map((team) => (
-            <Link to={`/squad/${team.id}`} key={team.id} className="p-4 bg-slate-800 rounded hover:bg-slate-700 block transition-colors">
-              <h2 className="font-bold">{team.name}</h2>
-              <p className="text-sm text-slate-400">{team.league}</p>
-            </Link>
+            <div key={team.id} className="flex items-center gap-2 bg-slate-800 rounded hover:bg-slate-700 transition-colors">
+              <Link to={`/squad/${team.id}`} className="flex-1 p-4 block">
+                <h2 className="font-bold">{team.name}</h2>
+                <p className="text-sm text-slate-400">{team.league}</p>
+              </Link>
+              <button
+                onClick={(e) => { e.preventDefault(); removeTeam(team.id); }}
+                className="mr-3 px-3 py-1 text-sm bg-red-900 hover:bg-red-600 text-red-300 hover:text-white rounded transition-colors"
+                title="Retirer de la liste"
+              >
+                Supprimer
+              </button>
+            </div>
           ))}
         </div>
       )}
